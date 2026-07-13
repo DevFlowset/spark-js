@@ -1349,7 +1349,7 @@ function initSwiperSliders() {
       freeMode: false,
       slideToClickedSlide: false,
       slidesPerView: 'auto',
-      spaceBetween: '4%',
+      spaceBetween: '0%',
       rewind: false,
       mousewheel: {
         forceToAxis: true,
@@ -1361,15 +1361,15 @@ function initSwiperSliders() {
       breakpoints: {
         480: {
           slidesPerView: 'auto',
-          spaceBetween: '3%',
+          spaceBetween: '0%',
         },
         768: {
           slidesPerView: 'auto',
-          spaceBetween: '3%',
+          spaceBetween: '0%',
         },
         992: {
           slidesPerView: 'auto',
-          spaceBetween: '2%',
+          spaceBetween: '0%',
         },
       },
       pagination: {
