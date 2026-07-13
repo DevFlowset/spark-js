@@ -1578,3 +1578,44 @@ document.addEventListener('DOMContentLoaded', function() {
 
   window.Webflow ||= [];
   window.Webflow.push(initNavbarLinkTextAnimations);
+
+
+
+// FOOTER CODE LINKS 
+ function initFooterLinkTextAnimations() {
+    document
+      .querySelectorAll(".footer_inner-list-item > a")
+      .forEach((link) => {
+        if (link.dataset.footerTextInitialized === "true") return;
+
+        const text = link.textContent.trim();
+        if (!text) return;
+
+        const track = document.createElement("span");
+        track.className = "footer-link-track";
+
+        const original = document.createElement("span");
+        original.className = "footer-link-original";
+        original.textContent = text;
+
+        const clone = document.createElement("span");
+        clone.className = "footer-link-clone";
+        clone.textContent = text;
+        clone.setAttribute("aria-hidden", "true");
+
+        track.append(original, clone);
+
+        link.textContent = "";
+        link.appendChild(track);
+
+        link.dataset.footerTextInitialized = "true";
+      });
+  }
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    initFooterLinkTextAnimations
+  );
+
+  window.Webflow ||= [];
+  window.Webflow.push(initFooterLinkTextAnimations);
