@@ -1524,7 +1524,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
+/* NAVBAR ACTIVE CLASS TOGGLE CODE */
 
+document.addEventListener('DOMContentLoaded', function() {
+  const navbar = document.querySelector('.navbar_component');
+  
+  window.addEventListener('scroll', function() {
+    const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    if (scrollPercent >= 2) {
+      navbar.classList.add('is-active');
+    } else {
+      navbar.classList.remove('is-active');
+    }
+  });
+});
 
-
-      
+/* NAVBAR ACTIVE CLASS TOGGLE CODE ENDS HERE*/
