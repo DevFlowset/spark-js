@@ -1255,6 +1255,7 @@ function initBunnyLightboxPlayer() {
 /* ============================================
    MARQUEE SCROLL DIRECTION
    ============================================ */
+/*
 function initMarqueeScrollDirection() {
   document.querySelectorAll('[data-marquee-scroll-direction-target]').forEach((marquee) => {
     // Query marquee elements
@@ -1341,7 +1342,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMarqueeScrollDirection();
 });
 
-
+*/
 
 /* ============================================
    SWIPER SLIDER (jQuery based)
