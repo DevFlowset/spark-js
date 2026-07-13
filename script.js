@@ -1541,3 +1541,40 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /* NAVBAR ACTIVE CLASS TOGGLE CODE ENDS HERE*/
+
+
+
+
+// NAVBAR LINK CODE
+  function initNavbarLinkTextAnimations() {
+    document.querySelectorAll(".navbar_link").forEach((link) => {
+      if (link.dataset.navbarTextInitialized === "true") return;
+
+      const text = link.textContent.trim();
+      if (!text) return;
+
+      const track = document.createElement("span");
+      track.className = "navbar-text-track";
+
+      const original = document.createElement("span");
+      original.className = "navbar-text-original";
+      original.textContent = text;
+
+      const clone = document.createElement("span");
+      clone.className = "navbar-text-clone";
+      clone.textContent = text;
+      clone.setAttribute("aria-hidden", "true");
+
+      track.append(original, clone);
+
+      link.textContent = "";
+      link.appendChild(track);
+
+      link.dataset.navbarTextInitialized = "true";
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", initNavbarLinkTextAnimations);
+
+  window.Webflow ||= [];
+  window.Webflow.push(initNavbarLinkTextAnimations);
