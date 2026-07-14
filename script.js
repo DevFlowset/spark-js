@@ -1364,6 +1364,7 @@ function initSwiperSliders() {
       centeredSlides: loopMode,
       followFinger: true,
       freeMode: false,
+      grabCursor: true,
       slideToClickedSlide: false,
       slidesPerView: 'auto',
       spaceBetween: '0%',
