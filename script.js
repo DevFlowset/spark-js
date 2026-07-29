@@ -1434,94 +1434,6 @@ document.addEventListener('DOMContentLoaded', function () {
 /* AUTO TABS CHAGING FOR CASE STUDY */
  /*  ============================================ */
 
-// document.addEventListener('DOMContentLoaded', function () {
-//   const AUTOPLAY_DELAY = 5000; // 5s per slide
-
-//   // Scope to every .slider-auto-tab-component on page
-//   const components = document.querySelectorAll('.slider-auto-tab-component');
-
-//   components.forEach((component) => {
-//     const wrapper = component.querySelector('.swiper-wrapper.is-slider-main');
-//     if (!wrapper) return; // skip if structure missing
-
-//     const swiperEl = component.querySelector('.swiper.is-slider-main');
-//     if (!swiperEl) return;
-
-//     const originalSlides = Array.from(wrapper.querySelectorAll('.swiper-slide.is-slider-main'));
-//     const totalSlides = originalSlides.length;
-//     if (totalSlides === 0) return;
-
-//     // Duplicate slides, appended after last real slide
-//     originalSlides.forEach((slide) => {
-//       const clone = slide.cloneNode(true);
-//       clone.setAttribute('data-swiper-clone', 'true');
-//       wrapper.appendChild(clone);
-//     });
-
-//     const tabItems = component.querySelectorAll('.cs-tab-thumbs');
-//     const progressBars = component.querySelectorAll('.thumbs_progress-bar-active');
-
-//     const mainSwiper = new Swiper(swiperEl, {
-//       slidesPerView: 'auto',
-//       loop: false,
-//       observer: true,
-//       observeParents: true,
-//       autoplay: {
-//         delay: AUTOPLAY_DELAY,
-//         disableOnInteraction: false,
-//       },
-//       speed: 600,
-//       on: {
-//         init: function () {
-//           setActiveTab(this.activeIndex % totalSlides);
-//           startProgress(this.activeIndex % totalSlides);
-//         },
-//         slideChange: function () {
-//           setActiveTab(this.activeIndex % totalSlides);
-//           resetAllProgress();
-//           startProgress(this.activeIndex % totalSlides);
-//         },
-//         transitionEnd: function () {
-//           if (this.activeIndex >= totalSlides) {
-//             const realIndex = this.activeIndex - totalSlides;
-//             this.slideTo(realIndex, 0, false);
-//           }
-//         },
-//       },
-//     });
-
-//     tabItems.forEach((tab, index) => {
-//       tab.addEventListener('click', () => {
-//         mainSwiper.slideTo(index);
-//       });
-//     });
-
-//     function setActiveTab(activeIndex) {
-//       tabItems.forEach((tab, index) => {
-//         tab.classList.toggle('is-active', index === activeIndex);
-//       });
-//     }
-
-//     function resetAllProgress() {
-//       progressBars.forEach((bar) => {
-//         bar.style.transition = 'none';
-//         bar.style.width = '0%';
-//         bar.offsetHeight; // force reflow
-//       });
-//     }
-
-//     function startProgress(activeIndex) {
-//       const bar = progressBars[activeIndex];
-//       if (!bar) return;
-//       bar.style.transition = `width ${AUTOPLAY_DELAY}ms linear`;
-//       requestAnimationFrame(() => {
-//         requestAnimationFrame(() => {
-//           bar.style.width = '100%';
-//         });
-//       });
-//     }
-//   });
-// });
 
 
 
@@ -1529,13 +1441,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
   const AUTOPLAY_DELAY = 5000; // 5s per slide
-
   const components = document.querySelectorAll('.slider-auto-tab-component');
 
   components.forEach((component) => {
     const wrapper = component.querySelector('.swiper-wrapper.is-slider-main');
     if (!wrapper) return;
-
     const swiperEl = component.querySelector('.swiper.is-slider-main');
     if (!swiperEl) return;
 
@@ -1543,7 +1453,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const totalSlides = originalSlides.length;
     if (totalSlides === 0) return;
 
-    // NEW: read slide-effect attribute
     const useFade = component.getAttribute('slide-effect') === 'fade';
 
     originalSlides.forEach((slide) => {
@@ -1555,27 +1464,28 @@ document.addEventListener('DOMContentLoaded', function () {
     const tabItems = component.querySelectorAll('.cs-tab-thumbs');
     const progressBars = component.querySelectorAll('.thumbs_progress-bar-active');
 
+    // autoplay off at init. Manual control via observer.
     const mainSwiper = new Swiper(swiperEl, {
-      slidesPerView: useFade ? 1 : 'auto', // fade needs 1
+      slidesPerView: useFade ? 1 : 'auto',
       loop: false,
       observer: true,
       observeParents: true,
       autoplay: {
         delay: AUTOPLAY_DELAY,
         disableOnInteraction: false,
+        enabled: false, // start disabled
       },
       speed: 600,
-      effect: useFade ? 'fade' : 'slide', // NEW
-      fadeEffect: useFade ? { crossFade: true } : undefined, // NEW
+      effect: useFade ? 'fade' : 'slide',
+      fadeEffect: useFade ? { crossFade: true } : undefined,
       on: {
         init: function () {
           setActiveTab(this.activeIndex % totalSlides);
-          startProgress(this.activeIndex % totalSlides);
         },
         slideChange: function () {
           setActiveTab(this.activeIndex % totalSlides);
           resetAllProgress();
-          startProgress(this.activeIndex % totalSlides);
+          if (isInView) startProgress(this.activeIndex % totalSlides);
         },
         transitionEnd: function () {
           if (this.activeIndex >= totalSlides) {
@@ -1616,9 +1526,40 @@ document.addEventListener('DOMContentLoaded', function () {
         });
       });
     }
+
+    // NEW: track view state
+    let isInView = false;
+    let hasEnteredOnce = false;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            isInView = true;
+
+            // reset to slide 1 first time it enters view
+            if (!hasEnteredOnce) {
+              hasEnteredOnce = true;
+              mainSwiper.slideTo(0, 0, false);
+              setActiveTab(0);
+            }
+
+            resetAllProgress();
+            startProgress(mainSwiper.activeIndex % totalSlides);
+            mainSwiper.autoplay.start();
+          } else {
+            isInView = false;
+            mainSwiper.autoplay.stop();
+            resetAllProgress();
+          }
+        });
+      },
+      { threshold: 0.5 } // 50% visible triggers
+    );
+
+    observer.observe(component);
   });
 });
-
 
 ////////////////////////////////////////////////////////////////////////////////
 
